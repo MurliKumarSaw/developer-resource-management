@@ -6,7 +6,7 @@ import Projects from "../pages/Projects.jsx";
 import Assignments from "../pages/Assignments.jsx";
 import Notifications from "../pages/Notifications.jsx";
 import DeveloperDetails from "../pages/DeveloperDetails.jsx";
-
+import Login from "../features/auth/Login/Login.jsx";
 
 
 
@@ -14,7 +14,11 @@ import DeveloperDetails from "../pages/DeveloperDetails.jsx";
 function AppRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/dashboard" replace />} />
+      <Route path="/login" element={<Login />} />
+      <Route
+  path="/"
+  element={<Navigate to="/login" replace />}
+/>
 
       <Route element={<AppLayout />}>
         <Route path="/dashboard" element={<Dashboard />} />
