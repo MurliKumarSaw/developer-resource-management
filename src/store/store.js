@@ -1,11 +1,9 @@
-import {configureStore} from "@reduxjs/toolkit";
+import { configureStore } from "@reduxjs/toolkit";
 
-const AppReducer = (state ={})=>{
-    return state;
-}
+import assignmentsReducer from "./slices/assignmentsSlice.js";
 
 export const store = configureStore({
-    reducer:{
-        app: AppReducer
-    }
-})
+  reducer: {
+    assignments: assignmentsReducer,
+  },
+});

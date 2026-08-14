@@ -1,11 +1,10 @@
 import { Link, useParams } from "react-router-dom";
-
+import { useSelector } from "react-redux";
 import Card from "../components/layout/common/Card";
 import Avatar from "../components/layout/common/Avatar";
 import Badge from "../components/layout/common/Badge";
 
 import developers from "../data/developers";
-import assignments from "../data/assignments";
 import projects from "../data/projects";
 import skills from "../data/skills";
 
@@ -15,7 +14,9 @@ function DeveloperDetails() {
   const developer = developers.find(
     (item) => item.id === developerId
   );
-
+const assignments = useSelector(
+  (state) => state.assignments
+);
   // Developer not found
   if (!developer) {
     return (

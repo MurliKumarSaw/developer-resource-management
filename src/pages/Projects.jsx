@@ -1,11 +1,17 @@
+import { useSelector } from "react-redux";
+
 import Card from "../components/layout/common/Card";
 import Badge from "../components/layout/common/Badge";
 
 import projects from "../data/projects";
 import clients from "../data/clients";
-import assignments from "../data/assignments";
 
 function Projects() {
+  // Assignments now come from Redux
+  const assignments = useSelector(
+    (state) => state.assignments
+  );
+
   return (
     <div className="space-y-6">
 
@@ -52,6 +58,7 @@ function Projects() {
             </thead>
 
             <tbody className="divide-y divide-slate-100">
+
               {projects.map((project) => {
 
                 const client = clients.find(
@@ -69,6 +76,7 @@ function Projects() {
                     key={project.id}
                     className="transition hover:bg-slate-50"
                   >
+
                     <td className="px-5 py-4">
                       <p className="text-sm font-semibold text-slate-900">
                         {project.name}
@@ -94,9 +102,11 @@ function Projects() {
                     <td className="px-5 py-4 text-sm text-slate-600">
                       {project.startDate} → {project.endDate}
                     </td>
+
                   </tr>
                 );
               })}
+
             </tbody>
 
           </table>

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import Card from "../components/layout/common/Card";
 import Avatar from "../components/layout/common/Avatar";
@@ -9,18 +10,47 @@ import developers from "../data/developers";
 function Developers() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("ALL");
+const assignments = useSelector(
+  (state) => state.assignments
+);
+const getDeveloperAllocation = (developerId) => {
+  return assignments
+    .filter(
+      (assignment) =>
+        assignment.developerId === developerId &&
+        assignment.status !== "DECLINED"
+    )
+    .reduce(
+      (total, assignment) =>
+        total + Number(assignment.allocation),
+      0
+    );
+};
 
-  const filteredDevelopers = developers.filter((developer) => {
-    const matchesSearch =
-      developer.name.toLowerCase().includes(search.toLowerCase()) ||
-      developer.role.toLowerCase().includes(search.toLowerCase());
+const getDeveloperStatus = (allocation) => {
+  if (allocation >= 100) {
+    return "FULLY_ASSIGNED";
+  }
 
-    const matchesStatus =
-      statusFilter === "ALL" ||
-      developer.status === statusFilter;
+  if (allocation > 0) {
+    return "PARTIALLY_ASSIGNED";
+  }
 
-    return matchesSearch && matchesStatus;
-  });
+  return "AVAILABLE";
+};const filteredDevelopers = developers.filter((developer) => {
+  const allocation = getDeveloperAllocation(developer.id);
+  const status = getDeveloperStatus(allocation);
+
+  const matchesSearch =
+    developer.name.toLowerCase().includes(search.toLowerCase()) ||
+    developer.role.toLowerCase().includes(search.toLowerCase());
+
+  const matchesStatus =
+    statusFilter === "ALL" ||
+    status === statusFilter;
+
+  return matchesSearch && matchesStatus;
+});
 
   return (
     <div className="space-y-6">
@@ -103,7 +133,13 @@ function Developers() {
                 <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                   Role
                 </th>
+<th className="px-5 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">
+  Allocation
+</th>
 
+<th className="px-5 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500">
+  Availability
+</th>
                 <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
                   Status
                 </th>
@@ -142,9 +178,22 @@ function Developers() {
                   <td className="px-5 py-4 text-sm text-slate-600">
                     {developer.role}
                   </td>
+<td className="px-5 py-4 text-right text-sm font-medium text-slate-700">
+  {getDeveloperAllocation(developer.id)}%
+</td>
 
+<td className="px-5 py-4 text-right text-sm font-medium text-slate-700">
+  {Math.max(
+    0,
+    100 - getDeveloperAllocation(developer.id)
+  )}%
+</td>
                   <td className="px-5 py-4">
-                    <Badge status={developer.status} />
+                   <Badge
+  status={getDeveloperStatus(
+    getDeveloperAllocation(developer.id)
+  )}
+/>
                   </td>
 
                   <td className="px-5 py-4 text-right">

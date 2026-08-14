@@ -1,4 +1,7 @@
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+
+import { addAssignment } from "../store/slices/assignmentsSlice.js";
 
 import Card from "../components/layout/common/Card";
 import Avatar from "../components/layout/common/Avatar";
@@ -6,7 +9,6 @@ import Badge from "../components/layout/common/Badge";
 
 import developers from "../data/developers";
 import projects from "../data/projects";
-import assignments from "../data/assignments";
 
 function Assignments() {
   const [selectedDeveloper, setSelectedDeveloper] = useState("");
@@ -15,9 +17,17 @@ function Assignments() {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
+  const dispatch = useDispatch();
+
+  // Get assignments from Redux
+  const assignments = useSelector(
+    (state) => state.assignments
+  );
+
   const handleAssign = (event) => {
     event.preventDefault();
 
+    // Basic validation
     if (
       !selectedDeveloper ||
       !selectedProject ||
@@ -25,20 +35,27 @@ function Assignments() {
       !startDate ||
       !endDate
     ) {
+      alert("Please fill in all fields.");
       return;
     }
 
-    console.log("New assignment:", {
+    // Create new assignment
+    const newAssignment = {
+      id: `ASSIGN-${Date.now()}`,
       developerId: selectedDeveloper,
       projectId: selectedProject,
       allocation: Number(allocation),
       startDate,
       endDate,
       status: "PENDING",
-    });
+    };
 
-    alert("Assignment created successfully");
+    // Add assignment to Redux
+    dispatch(addAssignment(newAssignment));
 
+    alert("Assignment created successfully.");
+
+    // Reset form
     setSelectedDeveloper("");
     setSelectedProject("");
     setAllocation("");
@@ -276,7 +293,10 @@ function Assignments() {
                 }
 
                 return (
-                  <tr key={assignment.id}>
+                  <tr
+                    key={assignment.id}
+                    className="transition hover:bg-slate-50"
+                  >
 
                     <td className="px-5 py-4">
                       <div className="flex items-center gap-3">
@@ -325,6 +345,7 @@ function Assignments() {
 
         {/* Mobile */}
         <div className="divide-y divide-slate-100 md:hidden">
+
           {assignments.map((assignment) => {
             const developer = developers.find(
               (item) =>
@@ -355,6 +376,7 @@ function Assignments() {
                   <div className="min-w-0 flex-1">
 
                     <div className="flex items-start justify-between gap-3">
+
                       <div>
                         <p className="text-sm font-semibold text-slate-900">
                           {developer.name}
@@ -366,6 +388,7 @@ function Assignments() {
                       </div>
 
                       <Badge status={assignment.status} />
+
                     </div>
 
                     <div className="mt-3 grid grid-cols-2 gap-3 text-sm">
@@ -390,6 +413,16 @@ function Assignments() {
                         </p>
                       </div>
 
+                      <div>
+                        <p className="text-xs text-slate-500">
+                          End
+                        </p>
+
+                        <p className="font-medium text-slate-900">
+                          {assignment.endDate}
+                        </p>
+                      </div>
+
                     </div>
 
                   </div>
@@ -397,6 +430,7 @@ function Assignments() {
               </div>
             );
           })}
+
         </div>
 
       </Card>

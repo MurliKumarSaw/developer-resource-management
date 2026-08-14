@@ -1,32 +1,33 @@
-import { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
 
 import Card from "../components/layout/common/Card";
 import Avatar from "../components/layout/common/Avatar";
+import Badge from "../components/layout/common/Badge";
 
-import notifications from "../data/notifications";
 import developers from "../data/developers";
 import projects from "../data/projects";
 
-function Notifications() {
-  const [notificationList, setNotificationList] =
-    useState(notifications);
+import {
+  updateAssignmentStatus,
+} from "../store/slices/assignmentsSlice.js";
 
-  const handleAction = (notificationId, action) => {
-    setNotificationList((currentNotifications) =>
-      currentNotifications.map((notification) =>
-        notification.id === notificationId
-          ? {
-              ...notification,
-              status:
-                action === "accept"
-                  ? "ACCEPTED"
-                  : "DECLINED",
-              read: true,
-            }
-          : notification
-      )
-    );
-  };
+function Notifications() {
+  const dispatch = useDispatch();
+
+  const assignments = useSelector(
+    (state) => state.assignments
+  );
+
+  console.log("Redux assignments:", assignments);
+
+  const pendingAssignments = assignments.filter(
+    (assignment) => assignment.status === "PENDING"
+  );
+
+  console.log(
+    "Pending assignments:",
+    pendingAssignments
+  );
 
   const getDeveloper = (developerId) =>
     developers.find(
@@ -37,6 +38,20 @@ function Notifications() {
     projects.find(
       (project) => project.id === projectId
     );
+
+  const handleAction = (assignmentId, action) => {
+    const newStatus =
+      action === "accept"
+        ? "ACCEPTED"
+        : "DECLINED";
+
+    dispatch(
+      updateAssignmentStatus({
+        assignmentId,
+        status: newStatus,
+      })
+    );
+  };
 
   return (
     <div className="space-y-6">
@@ -55,16 +70,16 @@ function Notifications() {
       {/* Notifications */}
       <Card className="overflow-hidden p-0">
 
-        {notificationList.length > 0 ? (
+        {pendingAssignments.length > 0 ? (
           <div className="divide-y divide-slate-100">
 
-            {notificationList.map((notification) => {
+            {pendingAssignments.map((assignment) => {
               const developer = getDeveloper(
-                notification.developerId
+                assignment.developerId
               );
 
               const project = getProject(
-                notification.projectId
+                assignment.projectId
               );
 
               if (!developer || !project) {
@@ -73,13 +88,10 @@ function Notifications() {
 
               return (
                 <div
-                  key={notification.id}
-                  className={`p-4 sm:p-5 ${
-                    !notification.read
-                      ? "bg-indigo-50/40"
-                      : "bg-white"
-                  }`}
+                  key={assignment.id}
+                  className="bg-indigo-50/40 p-4 sm:p-5"
                 >
+
                   <div className="flex items-start gap-3">
 
                     <Avatar
@@ -89,6 +101,7 @@ function Notifications() {
 
                     <div className="min-w-0 flex-1">
 
+                      {/* Notification Header */}
                       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
 
                         <div>
@@ -104,14 +117,13 @@ function Notifications() {
                           </p>
                         </div>
 
-                        {!notification.read && (
-                          <span className="w-fit rounded-full bg-indigo-100 px-2.5 py-1 text-xs font-medium text-indigo-700">
-                            New
-                          </span>
-                        )}
+                        <span className="w-fit rounded-full bg-indigo-100 px-2.5 py-1 text-xs font-medium text-indigo-700">
+                          New
+                        </span>
 
                       </div>
 
+                      {/* Assignment Details */}
                       <div className="mt-3 grid grid-cols-2 gap-3 rounded-lg bg-white p-3 text-sm sm:max-w-xl sm:grid-cols-4">
 
                         <div>
@@ -140,7 +152,7 @@ function Notifications() {
                           </p>
 
                           <p className="mt-1 font-medium text-slate-900">
-                            {notification.allocation}%
+                            {assignment.allocation}%
                           </p>
                         </div>
 
@@ -149,62 +161,47 @@ function Notifications() {
                             Status
                           </p>
 
-                          <p className="mt-1 font-medium text-slate-900">
-                            {notification.status || "PENDING"}
-                          </p>
+                          <div className="mt-1">
+                            <Badge status={assignment.status} />
+                          </div>
                         </div>
 
                       </div>
 
                       {/* Actions */}
-                      {(!notification.status ||
-                        notification.status === "PENDING") && (
-                        <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+                      <div className="mt-4 flex flex-col gap-2 sm:flex-row">
 
-                          <button
-                            type="button"
-                            onClick={() =>
-                              handleAction(
-                                notification.id,
-                                "accept"
-                              )
-                            }
-                            className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-700"
-                          >
-                            Accept Assignment
-                          </button>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleAction(
+                              assignment.id,
+                              "accept"
+                            )
+                          }
+                          className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-emerald-700"
+                        >
+                          Accept Assignment
+                        </button>
 
-                          <button
-                            type="button"
-                            onClick={() =>
-                              handleAction(
-                                notification.id,
-                                "decline"
-                              )
-                            }
-                            className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
-                          >
-                            Decline
-                          </button>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            handleAction(
+                              assignment.id,
+                              "decline"
+                            )
+                          }
+                          className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+                        >
+                          Decline
+                        </button>
 
-                        </div>
-                      )}
-
-                      {/* Result */}
-                      {notification.status === "ACCEPTED" && (
-                        <p className="mt-3 text-sm font-medium text-emerald-600">
-                          Assignment accepted.
-                        </p>
-                      )}
-
-                      {notification.status === "DECLINED" && (
-                        <p className="mt-3 text-sm font-medium text-red-600">
-                          Assignment declined.
-                        </p>
-                      )}
+                      </div>
 
                     </div>
                   </div>
+
                 </div>
               );
             })}
@@ -213,7 +210,7 @@ function Notifications() {
         ) : (
           <div className="p-8 text-center">
             <p className="text-sm font-medium text-slate-900">
-              No notifications
+              No pending notifications
             </p>
 
             <p className="mt-1 text-sm text-slate-500">

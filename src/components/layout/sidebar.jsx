@@ -1,53 +1,70 @@
-import {LayoutDashboard,
-    Users,FolderKanban,
-    ClipboardList,
-    Bell,
-    X
+import {
+  LayoutDashboard,
+  Users,
+  FolderKanban,
+  ClipboardList,
+  Bell,
+  X,
 } from "lucide-react";
 
-import {NavLink} from "react-router-dom";
+import { NavLink } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const navItems = [
-    {
-        name: "Dashboard",  
-        icon: LayoutDashboard,
-        path: "/dashboard"
-    },
-    {
-        name: "Developers",
-        icon: Users,
-        path: "/developers"
-    },
-    {
-        name: "Projects",
-        icon: FolderKanban,
-        path: "/projects"
-    },
-    {
-        name: "Assignments",
-        icon: ClipboardList,
-        path: "/assignments"
-    },
-    {
-        name: "Notifications",
-        icon: Bell,
-        path: "/notifications"
-    },
-    {
-        name: "Logout",
-        icon: X,
-        path: "/logout"
-    }
+  {
+    name: "Dashboard",
+    icon: LayoutDashboard,
+    path: "/dashboard",
+  },
+  {
+    name: "Developers",
+    icon: Users,
+    path: "/developers",
+  },
+  {
+    name: "Projects",
+    icon: FolderKanban,
+    path: "/projects",
+  },
+  {
+    name: "Assignments",
+    icon: ClipboardList,
+    path: "/assignments",
+  },
+  {
+    name: "Notifications",
+    icon: Bell,
+    path: "/notifications",
+  },
+  {
+    name: "Logout",
+    icon: X,
+    path: "/logout",
+  },
 ];
 
-export default function Sidebar({isOpen, onClose}) {
-    return (
-        <>
-        {
-        isOpen && (
-            <div className="fixed inset-0 z-40 bg-slate-900/50 lg:hidden" onClick={onClose} aria-hidden="true"></div>
-        ) }
-        <aside
+export default function Sidebar({ isOpen, onClose }) {
+  // Get assignments from Redux
+  const assignments = useSelector(
+    (state) => state.assignments
+  );
+
+  // Count pending assignments
+  const pendingCount = assignments.filter(
+    (assignment) => assignment.status === "PENDING"
+  ).length;
+
+  return (
+    <>
+      {isOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-slate-900/50 lg:hidden"
+          onClick={onClose}
+          aria-hidden="true"
+        ></div>
+      )}
+
+      <aside
         className={`
           fixed inset-y-0 left-0 z-50
           flex w-64 flex-col
@@ -55,8 +72,10 @@ export default function Sidebar({isOpen, onClose}) {
           transition-transform duration-300
           lg:static lg:translate-x-0
           ${isOpen ? "translate-x-0" : "-translate-x-full"}
-        `}>
-<div className="flex h-16 items-center justify-between border-b border-slate-200 px-5">
+        `}
+      >
+        {/* Header */}
+        <div className="flex h-16 items-center justify-between border-b border-slate-200 px-5">
           <div>
             <h1 className="text-lg font-bold text-slate-900">
               ResourceHub
@@ -100,7 +119,18 @@ export default function Sidebar({isOpen, onClose}) {
                 }
               >
                 <Icon size={19} />
-                <span>{item.name}</span>
+
+                <span className="flex-1">
+                  {item.name}
+                </span>
+
+                {/* Pending notification count */}
+                {item.name === "Notifications" &&
+                  pendingCount > 0 && (
+                    <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-xs font-semibold text-white">
+                      {pendingCount}
+                    </span>
+                  )}
               </NavLink>
             );
           })}
@@ -124,8 +154,7 @@ export default function Sidebar({isOpen, onClose}) {
             </div>
           </div>
         </div>
-        </aside>
-       
-        </>
-    );
+      </aside>
+    </>
+  );
 }

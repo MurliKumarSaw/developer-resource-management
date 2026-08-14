@@ -1,46 +1,89 @@
+import { useSelector } from "react-redux";
+
 import Card from "../components/layout/common/Card";
 import Avatar from "../components/layout/common/Avatar";
 import Badge from "../components/layout/common/Badge";
 
 import developers from "../data/developers";
-import assignments from "../data/assignments";
 import projects from "../data/projects";
 
 function Dashboard() {
   // -----------------------------
+  // Get assignments from Redux
+  // -----------------------------
+
+  const assignments = useSelector(
+    (state) => state.assignments
+  );
+
+  // -----------------------------
+  // Calculate developer allocation
+  // -----------------------------
+
+  const getDeveloperAllocation = (developerId) => {
+    return assignments
+      .filter(
+        (assignment) =>
+          assignment.developerId === developerId &&
+          assignment.status !== "DECLINED"
+      )
+      .reduce(
+        (total, assignment) =>
+          total + Number(assignment.allocation),
+        0
+      );
+  };
+
+  // -----------------------------
   // Developer statistics
   // -----------------------------
 
-  const totalDevelopers = developers.length;
+  const developerStats = developers.map((developer) => {
+    const allocation = getDeveloperAllocation(developer.id);
 
-  const availableDevelopers = developers.filter(
-    (developer) => developer.status === "AVAILABLE"
+    return {
+      ...developer,
+      allocation,
+      availableCapacity: Math.max(
+        0,
+        100 - allocation
+      ),
+    };
+  });
+
+  const totalDevelopers = developerStats.length;
+
+  const availableDevelopers = developerStats.filter(
+    (developer) => developer.allocation === 0
   ).length;
 
-  const fullyAssignedDevelopers = developers.filter(
-    (developer) => developer.status === "FULLY_ASSIGNED"
+  const fullyAssignedDevelopers = developerStats.filter(
+    (developer) => developer.allocation >= 100
   ).length;
 
-  const partiallyAssignedDevelopers = developers.filter(
-    (developer) => developer.status === "PARTIALLY_ASSIGNED"
+  const partiallyAssignedDevelopers = developerStats.filter(
+    (developer) =>
+      developer.allocation > 0 &&
+      developer.allocation < 100
   ).length;
 
   // -----------------------------
   // Resource utilization
   // -----------------------------
 
-  const acceptedAssignments = assignments.filter(
-    (assignment) => assignment.status === "ACCEPTED"
-  );
+  const totalCapacity = totalDevelopers * 100;
 
-  const totalAllocation = acceptedAssignments.reduce(
-    (total, assignment) => total + assignment.allocation,
+  const allocatedCapacity = developerStats.reduce(
+    (total, developer) =>
+      total + developer.allocation,
     0
   );
 
   const averageUtilization =
-    totalDevelopers > 0
-      ? Math.round(totalAllocation / totalDevelopers)
+    totalCapacity > 0
+      ? Math.round(
+          (allocatedCapacity / totalCapacity) * 100
+        )
       : 0;
 
   // -----------------------------
@@ -48,16 +91,20 @@ function Dashboard() {
   // -----------------------------
 
   const recentAssignments = assignments
-    .filter((assignment) => assignment.status !== "DECLINED")
+    .filter(
+      (assignment) => assignment.status !== "DECLINED"
+    )
     .slice(-5)
     .reverse()
     .map((assignment) => {
       const developer = developers.find(
-        (developer) => developer.id === assignment.developerId
+        (developer) =>
+          developer.id === assignment.developerId
       );
 
       const project = projects.find(
-        (project) => project.id === assignment.projectId
+        (project) =>
+          project.id === assignment.projectId
       );
 
       return {
@@ -150,7 +197,9 @@ function Dashboard() {
           <div className="mt-5 h-3 overflow-hidden rounded-full bg-slate-100">
             <div
               className="h-full rounded-full bg-indigo-500"
-              style={{ width: `${averageUtilization}%` }}
+              style={{
+                width: `${averageUtilization}%`,
+              }}
             />
           </div>
         </Card>
@@ -175,17 +224,22 @@ function Dashboard() {
                 className="flex items-center gap-3"
               >
                 <Avatar
-                  name={assignment.developer.name}
+                  name={
+                    assignment.developer?.name ||
+                    "Unknown"
+                  }
                   size="sm"
                 />
 
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium text-slate-900">
-                    {assignment.developer.name}
+                    {assignment.developer?.name ||
+                      "Unknown Developer"}
                   </p>
 
                   <p className="truncate text-xs text-slate-500">
-                    {assignment.project.name}
+                    {assignment.project?.name ||
+                      "Unknown Project"}
                   </p>
                 </div>
 
