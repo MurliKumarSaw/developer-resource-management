@@ -3,32 +3,13 @@ import AppLayout from "../components/layout/AppLayout.jsx";
 import Dashboard from "../pages/Dashboard.jsx";
 import Developers from "../pages/Developers.jsx";
 import Projects from "../pages/Projects.jsx";
-
-function DeveloperDetails() {
-  return (
-    <div>
-      <h1>Developer Details</h1>
-    </div>
-  );
-}
+import Assignments from "../pages/Assignments.jsx";
+import Notifications from "../pages/Notifications.jsx";
+import DeveloperDetails from "../pages/DeveloperDetails.jsx";
 
 
 
-function Assignments() {
-  return (
-    <div>
-      <h1>Assignments</h1>
-    </div>
-  );
-}
 
-function Notifications() {
-  return (
-    <div>
-      <h1>Notifications</h1>
-    </div>
-  );
-}
 
 function AppRoutes() {
   return (

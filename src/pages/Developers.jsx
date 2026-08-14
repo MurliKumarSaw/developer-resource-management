@@ -1,5 +1,5 @@
 import { useState } from "react";
-
+import { Link } from "react-router-dom";
 import Card from "../components/layout/common/Card";
 import Avatar from "../components/layout/common/Avatar";
 import Badge from "../components/layout/common/Badge";
@@ -148,12 +148,10 @@ function Developers() {
                   </td>
 
                   <td className="px-5 py-4 text-right">
-                    <a
-                      href={`/developers/${developer.id}`}
-                      className="text-sm font-medium text-indigo-600 hover:text-indigo-700"
-                    >
-                      View
-                    </a>
+                    <Link to={`/developers/${developer.id}`} className="text-sm font-medium text-indigo-600 hover:text-indigo-700">
+  View
+</Link>
+                   
                   </td>
                 </tr>
               ))}
