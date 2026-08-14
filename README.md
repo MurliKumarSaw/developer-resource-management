@@ -867,3 +867,32 @@ Developer Resource Management System created as part of a technical assignment.
 # License
 
 This project was created for technical evaluation and demonstration purposes.
+
+# Screenshots
+
+<img width="1919" height="864" alt="image" src="https://github.com/user-attachments/assets/f3c0ee0e-0a10-4f28-801a-dceebe272ded" />
+
+
+<img width="1919" height="866" alt="image" src="https://github.com/user-attachments/assets/9f92f6d6-ace4-4644-a8b2-53ee09463137" />
+
+
+<img width="1919" height="866" alt="image" src="https://github.com/user-attachments/assets/1510c9be-fbab-44ec-ac49-94854911485e" />
+
+
+<img width="1919" height="868" alt="image" src="https://github.com/user-attachments/assets/07fefa95-8365-4f5a-8b59-d58eae85e6cf" />
+
+
+<img width="1918" height="864" alt="image" src="https://github.com/user-attachments/assets/b71128aa-d5dc-47a6-8536-28d80babb32e" />
+
+
+
+<img width="1919" height="868" alt="image" src="https://github.com/user-attachments/assets/5e0d11d6-e7f4-47fb-9ef8-3a92a7635d9d" />
+
+
+
+
+
+
+
+
+
